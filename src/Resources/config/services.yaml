@@ -1,0 +1,90 @@
+services:
+  #
+  # Factories
+  #
+  sweikenb_contracts.factory.state_model:
+    class: Sweikenb\Bundle\Contracts\Model\Factory\StateModelFactory
+
+  sweikenb_contracts.factory.finder:
+    class: Sweikenb\Bundle\Contracts\Model\Factory\FinderFactory
+
+
+  #
+  # Services
+  #
+  sweikenb_contracts.service.validator:
+    class: Sweikenb\Bundle\Contracts\Service\ValidatorService
+    arguments:
+      $scannerService: '@sweikenb_contracts.service.scanner'
+      $lockfileService: '@sweikenb_contracts.service.lockfile'
+      $failureHandlerService: '@sweikenb_contracts.service.failure_handler'
+
+  sweikenb_contracts.service.failure_handler:
+    class: Sweikenb\Bundle\Contracts\Service\FailureHandlerService
+    arguments:
+      $failAction: '%sweikenb_contracts.on_unexpected_change%'
+
+  sweikenb_contracts.service.lockfile:
+    class: Sweikenb\Bundle\Contracts\Service\LockfileService
+    arguments:
+      $stateModelFactory: '@sweikenb_contracts.factory.state_model'
+      $lockfile: '%sweikenb_contracts.lockfile%'
+
+  sweikenb_contracts.service.scanner:
+    class: Sweikenb\Bundle\Contracts\Service\ScannerService
+    arguments:
+      $finderFactory: '@sweikenb_contracts.factory.finder'
+      $stateService: '@sweikenb_contracts.service.state'
+      $scanDirs: '%sweikenb_contracts.scan_dirs%'
+      $scanFilePattern: '%sweikenb_contracts.scan_file_patterns%'
+      $scanIgnoreFilePattern: '%sweikenb_contracts.scan_ignore_file_patterns%'
+
+  sweikenb_contracts.service.state:
+    class: Sweikenb\Bundle\Contracts\Service\StateService
+    arguments:
+      $stateModelFactory: '@sweikenb_contracts.factory.state_model'
+
+
+  #
+  # Commands
+  #
+  sweikenb_contracts.command.lock:
+    class: Sweikenb\Bundle\Contracts\Command\ContractsLockCommand
+    arguments:
+      $lockfileService: '@sweikenb_contracts.service.lockfile'
+      $scannerService: '@sweikenb_contracts.service.scanner'
+      $stateService: '@sweikenb_contracts.service.state'
+      $stateModelFactory: '@sweikenb_contracts.factory.state_model'
+    tags:
+      - 'console.command'
+
+  sweikenb_contracts.command.validate:
+    class: Sweikenb\Bundle\Contracts\Command\ContractsValidateCommand
+    arguments:
+      $validatorService: '@sweikenb_contracts.service.validator'
+    tags:
+      - 'console.command'
+
+  sweikenb_contracts.command.diff:
+    class: Sweikenb\Bundle\Contracts\Command\ContractsDiffCommand
+    arguments:
+      $lockfileService: '@sweikenb_contracts.service.lockfile'
+      $scannerService: '@sweikenb_contracts.service.scanner'
+      $stateService: '@sweikenb_contracts.service.state'
+      $stateModelFactory: '@sweikenb_contracts.factory.state_model'
+    tags:
+      - 'console.command'
+
+  #
+  # Aliases
+  #
+  Sweikenb\Bundle\Contracts\Model\Factory\StateModelFactory: '@sweikenb_contracts.factory.state_model'
+  Sweikenb\Bundle\Contracts\Model\Factory\FinderFactory: '@sweikenb_contracts.factory.finder'
+  Sweikenb\Bundle\Contracts\Service\ValidatorService: '@sweikenb_contracts.service.validator'
+  Sweikenb\Bundle\Contracts\Service\FailureHandlerService: '@sweikenb_contracts.service.failure_handler'
+  Sweikenb\Bundle\Contracts\Service\LockfileService: '@sweikenb_contracts.service.lockfile'
+  Sweikenb\Bundle\Contracts\Service\ScannerService: '@sweikenb_contracts.service.scanner'
+  Sweikenb\Bundle\Contracts\Service\StateService: '@sweikenb_contracts.service.state'
+  Sweikenb\Bundle\Contracts\Command\ContractsLockCommand: '@sweikenb_contracts.command.lock'
+  Sweikenb\Bundle\Contracts\Command\ContractsValidateCommand: '@sweikenb_contracts.command.validate'
+  Sweikenb\Bundle\Contracts\Command\ContractsDiffCommand: '@sweikenb_contracts.command.diff'

@@ -1,0 +1,25 @@
+{
+    "name": "sweikenb/contracts-bundle",
+    "description": "Helper bundle that ensures your public and private contracts don't change unintentionally during development.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Simon Schröer",
+            "email": "code@sweikenb.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "symfony/console": "5.4.*",
+        "symfony/finder": "5.4.*",
+        "symfony/framework-bundle": "^5.4",
+        "symfony/http-client": "5.4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sweikenb\\Bundle\\Contracts\\": "src"
+        }
+    }
+}
