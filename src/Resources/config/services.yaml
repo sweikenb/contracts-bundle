@@ -4,6 +4,8 @@ services:
   #
   sweikenb_contracts.factory.state_model:
     class: Sweikenb\Bundle\Contracts\Model\Factory\StateModelFactory
+    arguments:
+      $v1Parser: '@sweikenb_contracts.state_parser.v1'
 
   sweikenb_contracts.factory.finder:
     class: Sweikenb\Bundle\Contracts\Model\Factory\FinderFactory
@@ -44,6 +46,9 @@ services:
     arguments:
       $stateModelFactory: '@sweikenb_contracts.factory.state_model'
 
+  sweikenb_contracts.service.state_diff:
+    class: Sweikenb\Bundle\Contracts\Service\StateDiffService
+
 
   #
   # Commands
@@ -53,7 +58,7 @@ services:
     arguments:
       $lockfileService: '@sweikenb_contracts.service.lockfile'
       $scannerService: '@sweikenb_contracts.service.scanner'
-      $stateService: '@sweikenb_contracts.service.state'
+      $stateDiffService: '@sweikenb_contracts.service.state_diff'
       $stateModelFactory: '@sweikenb_contracts.factory.state_model'
     tags:
       - 'console.command'
@@ -70,10 +75,32 @@ services:
     arguments:
       $lockfileService: '@sweikenb_contracts.service.lockfile'
       $scannerService: '@sweikenb_contracts.service.scanner'
-      $stateService: '@sweikenb_contracts.service.state'
+      $stateDiffService: '@sweikenb_contracts.service.state_diff'
       $stateModelFactory: '@sweikenb_contracts.factory.state_model'
     tags:
       - 'console.command'
+
+
+  #
+  # Event handlers
+  #
+  sweikenb_contracts.trigger_handler.cache:
+    class: Sweikenb\Bundle\Contracts\Service\Triggers\CacheTriggerService
+    arguments:
+      $validatorService: '@sweikenb_contracts.service.validator'
+      $triggerConfig: '%sweikenb_contracts.triggers%'
+      $currentAppEnv: '%kernel.environment%'
+    tags:
+      # the registration as cache-clearer is a workaround for a missing cache:clear event
+      - { name: kernel.cache_clearer, priority: -257 }
+
+
+  #
+  # Versioned state data parser
+  #
+  sweikenb_contracts.state_parser.v1:
+    class: Sweikenb\Bundle\Contracts\Service\Parser\State\Version1
+
 
   #
   # Aliases
@@ -85,6 +112,9 @@ services:
   Sweikenb\Bundle\Contracts\Service\LockfileService: '@sweikenb_contracts.service.lockfile'
   Sweikenb\Bundle\Contracts\Service\ScannerService: '@sweikenb_contracts.service.scanner'
   Sweikenb\Bundle\Contracts\Service\StateService: '@sweikenb_contracts.service.state'
+  Sweikenb\Bundle\Contracts\Service\StateDiffService: '@sweikenb_contracts.service.state_diff'
   Sweikenb\Bundle\Contracts\Command\ContractsLockCommand: '@sweikenb_contracts.command.lock'
   Sweikenb\Bundle\Contracts\Command\ContractsValidateCommand: '@sweikenb_contracts.command.validate'
   Sweikenb\Bundle\Contracts\Command\ContractsDiffCommand: '@sweikenb_contracts.command.diff'
+  Sweikenb\Bundle\Contracts\Service\Triggers\CacheTriggerService: '@sweikenb_contracts.trigger_handler.cache'
+  Sweikenb\Bundle\Contracts\Service\Parser\State\Version1: '@sweikenb_contracts.state_parser.v1'

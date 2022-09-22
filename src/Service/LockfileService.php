@@ -2,6 +2,7 @@
 
 namespace Sweikenb\Bundle\Contracts\Service;
 
+use JsonException;
 use Sweikenb\Bundle\Contracts\Exceptions\LockfileException;
 use Sweikenb\Bundle\Contracts\Exceptions\StateException;
 use Sweikenb\Bundle\Contracts\Model\Factory\StateModelFactory;
@@ -50,10 +51,11 @@ class LockfileService
 
     /**
      * @throws LockfileException
+     * @throws JsonException
      */
     public function persist(StateModel $state): bool
     {
-        $content = json_encode($state->toArray(), JSON_FORCE_OBJECT);
+        $content = json_encode($state->toArray(), JSON_FORCE_OBJECT | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
         $hash = sha1($content);
         if (!file_put_contents($this->lockfile, sprintf("%s\n%s", $hash, $content))) {
             throw new LockfileException('Contracts lockfile could not be persisted.');

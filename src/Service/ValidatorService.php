@@ -40,9 +40,8 @@ class ValidatorService
 
         // compare states
         if ($expectedState->getHash() !== $currentState->getHash()) {
-            return $this->failureHandlerService->execute(
-                'Unexpected contract changes detected! Execute "contracts:diff" for further details.'
-            );
+            return $this->failureHandlerService
+                ->execute("Unexpected contract changes detected!\n> Execute \"contracts:diff\" for further details.");
         }
 
         return true;

@@ -20,11 +20,11 @@ class FailureHandlerService
     public function execute(string $message): bool
     {
         if ($this->failAction === Configuration::ACTION_FAIL) {
-            throw new ContractValidationException(sprintf("CONTRACTS VALIDATION ERROR: %s", $message));
+            throw new ContractValidationException(sprintf("CONTRACTS VALIDATION ERROR:\n%s", $message));
         }
 
         if ($this->failAction === Configuration::ACTION_WARNING) {
-            fwrite(STDERR, sprintf("CONTRACTS VALIDATION WARNING: %s\n", $message));
+            fwrite(STDERR, sprintf("CONTRACTS VALIDATION WARNING:\n%s\n", $message));
         }
 
         return false;
