@@ -19,7 +19,6 @@ class Configuration implements ConfigurationInterface
     public const ACTION_FAIL = 'fail';
     public const ACTION_WARNING = 'warning';
 
-    public const TRIGGER_COMPOSER = 'composer';
     public const TRIGGER_CACHE_CLEAR = 'cache_clear';
 
     public function getConfigTreeBuilder()
@@ -54,12 +53,8 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode(self::TRIGGERS)
                     ->scalarPrototype()->end()
                     ->defaultValue([
-                        self::TRIGGER_COMPOSER.':require',
-                        self::TRIGGER_COMPOSER.':install',
-                        self::TRIGGER_COMPOSER.':update',
                         self::TRIGGER_CACHE_CLEAR.':dev',
                         self::TRIGGER_CACHE_CLEAR.':test',
-                        self::TRIGGER_CACHE_CLEAR.':prod',
                     ])
                 ->end()
             ->end();

@@ -7,7 +7,7 @@ use Sweikenb\Bundle\Contracts\Exceptions\StateException;
 use Sweikenb\Bundle\Contracts\Model\Factory\StateModelFactory;
 use Sweikenb\Bundle\Contracts\Service\LockfileService;
 use Sweikenb\Bundle\Contracts\Service\ScannerService;
-use Sweikenb\Bundle\Contracts\Service\StateService;
+use Sweikenb\Bundle\Contracts\Service\StateDiffService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,25 +16,25 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ContractsLockCommand extends Command
 {
-    public const CMD_NAME = 'contracts:lock';
+    public const CMD_NAME = 'sweikenb:contracts:lock';
     public const OPT_FORCE = 'force';
 
     private LockfileService $lockfileService;
     private ScannerService $scannerService;
-    private StateService $stateService;
+    private StateDiffService $stateDiffService;
     private StateModelFactory $stateModelFactory;
 
     public function __construct(
         LockfileService $lockfileService,
         ScannerService $scannerService,
-        StateService $stateService,
+        StateDiffService $stateDiffService,
         StateModelFactory $stateModelFactory,
         string $name = null
     ) {
         parent::__construct($name);
         $this->lockfileService = $lockfileService;
         $this->scannerService = $scannerService;
-        $this->stateService = $stateService;
+        $this->stateDiffService = $stateDiffService;
         $this->stateModelFactory = $stateModelFactory;
     }
 
@@ -53,6 +53,7 @@ class ContractsLockCommand extends Command
     /**
      * @throws StateException
      * @throws LockfileException
+     * @throws \JsonException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -65,7 +66,7 @@ class ContractsLockCommand extends Command
         }
 
         $currentState = $this->scannerService->execute();
-        $diffSuccess = $this->stateService->diff($io, $lockfileState, $currentState);
+        $diffSuccess = $this->stateDiffService->execute($io, $lockfileState, $currentState);
 
         if (!$diffSuccess && !$input->getOption(self::OPT_FORCE)) {
             $io->caution(

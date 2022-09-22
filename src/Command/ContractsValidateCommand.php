@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ContractsValidateCommand extends Command
 {
-    public const CMD_NAME = 'contracts:validate';
+    public const CMD_NAME = 'sweikenb:contracts:validate';
     private ValidatorService $validatorService;
 
     public function __construct(ValidatorService $validatorService, string $name = null)
@@ -38,13 +38,13 @@ class ContractsValidateCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if ($this->validatorService->execute()) {
-            $io->success('Validation successful');
+            $io->success('Contracts validation successful');
             return self::SUCCESS;
         }
 
         // This is just a fallback, if the validation failed the validator service is expected to throw an exception
         // so this part should not be reached if everything is working correctly.
-        $io->error('Validation failed for unknown reason.');
+        $io->error('Contracts validation failed due to invalid configuration.');
         return self::FAILURE;
     }
 }
